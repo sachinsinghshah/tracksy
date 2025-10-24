@@ -14,6 +14,10 @@ export async function POST(request: NextRequest) {
     // Verify cron secret for security
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
+    
+    // Also check query parameter for compatibility with external cron services
+    const { searchParams } = new URL(request.url);
+    const querySecret = searchParams.get("secret");
 
     if (!cronSecret) {
       console.error("[Cron] CRON_SECRET not configured");
@@ -23,7 +27,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (authHeader !== `Bearer ${cronSecret}`) {
+    // Check both Authorization header and query parameter
+    const isAuthorized = 
+      authHeader === `Bearer ${cronSecret}` || 
+      querySecret === cronSecret;
+
+    if (!isAuthorized) {
       console.error("[Cron] Unauthorized access attempt");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
