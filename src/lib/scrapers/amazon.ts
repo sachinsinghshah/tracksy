@@ -1,5 +1,4 @@
 import type { ScrapedProduct, ScraperResult } from "@/types";
-import { Browser, Page } from "puppeteer-core";
 
 // Dynamic imports for different environments
 const getPuppeteer = async () => {
@@ -34,8 +33,8 @@ function delay(ms: number): Promise<void> {
 export async function scrapeAmazonProduct(
   url: string
 ): Promise<ScraperResult> {
-  let browser: Browser | null = null;
-  let page: Page | null = null;
+  let browser: any = null;
+  let page: any = null;
 
   try {
     console.log(`[Scraper] Starting scrape for: ${url}`);
