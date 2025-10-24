@@ -46,7 +46,7 @@ export async function scrapeAmazonProduct(
     // Launch browser with stealth settings
     // Use chromium for Vercel, puppeteer for local development
     const launchOptions: any = {
-      headless: chromium ? chromium.headless : true,
+      headless: true,
       args: chromium
         ? [
             ...chromium.args,
