@@ -79,7 +79,7 @@ export async function scrapeAmazonProduct(
 
     // Block unnecessary resources to speed up
     await page.setRequestInterception(true);
-    page.on("request", (req) => {
+    page.on("request", (req: any) => {
       const resourceType = req.resourceType();
       if (
         resourceType === "image" ||
