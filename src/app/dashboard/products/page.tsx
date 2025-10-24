@@ -186,7 +186,12 @@ export default async function ProductsPage() {
                       </a>
                       <DeleteProductButton productId={product.id} />
                     </div>
-                    <RefreshPriceButton productId={product.id} />
+                    <div className="flex gap-2">
+                      <RefreshPriceButton productId={product.id} />
+                      <Link href={`/dashboard/products/${product.id}`} className="flex-1">
+                        <Button size="sm" className="w-full">View Details</Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </Card>
