@@ -1,18 +1,8 @@
-import type { ScrapedProduct, ScraperResult } from "@/types";
-
-// Dynamic imports for different environments
-const getPuppeteer = async () => {
-  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-    // Serverless environment
-    const chromium = await import("@sparticuz/chromium");
-    const puppeteerCore = await import("puppeteer-core");
-    return { puppeteer: puppeteerCore.default, chromium: chromium.default };
-  } else {
-    // Local development
-    const puppeteer = await import("puppeteer");
-    return { puppeteer: puppeteer.default, chromium: null };
-  }
-};
+// Re-export the Cheerio-based scraper (works on Vercel)
+export {
+  scrapeAmazonProduct,
+  scrapeAmazonProductWithRetry,
+} from "./amazon-cheerio";
 
 // User agents for rotation
 const USER_AGENTS = [
