@@ -1,7 +1,7 @@
 export interface ScrapedProduct {
   title: string;
   price: number;
-  imageUrl: string;
+  imageUrl?: string; // Optional since not all products have images
   availability: boolean;
   currency: string;
 }
