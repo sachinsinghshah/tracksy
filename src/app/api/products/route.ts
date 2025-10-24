@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { url, targetPrice } = validation.data;
+    const { url, targetPrice, category } = validation.data;
 
     // Extract product ID
     const productId = extractAmazonProductId(url);
@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
       url: normalizedUrl,
       site,
       target_price: targetPrice,
+      category: category,
       is_active: true,
     };
 

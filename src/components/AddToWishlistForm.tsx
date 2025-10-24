@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import {
-  addProductFormSchema,
-  type AddProductFormInput,
-} from "@/lib/validators/product";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -26,54 +24,68 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, Loader2 } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { CategorySelector } from "./CategorySelector";
 
-interface AddProductFormProps {
+const addToWishlistSchema = z.object({
+  url: z.string().url("Please provide a valid URL"),
+  title: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+type AddToWishlistFormInput = z.infer<typeof addToWishlistSchema>;
+
+interface AddToWishlistFormProps {
   onSuccess?: () => void;
 }
 
-export function AddProductForm({ onSuccess }: AddProductFormProps) {
+export function AddToWishlistForm({ onSuccess }: AddToWishlistFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const form = useForm<AddProductFormInput>({
-    resolver: zodResolver(addProductFormSchema),
+  const form = useForm<AddToWishlistFormInput>({
+    resolver: zodResolver(addToWishlistSchema),
     defaultValues: {
       url: "",
-      targetPrice: undefined,
-      category: null,
+      title: "",
+      notes: "",
     },
   });
 
-  async function onSubmit(values: AddProductFormInput) {
+  async function onSubmit(values: AddToWishlistFormInput) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/products", {
+      // Extract site from URL
+      const url = new URL(values.url);
+      const site = url.hostname.replace("www.", "");
+
+      const response = await fetch("/api/wishlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          site,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to add product");
+        throw new Error(data.error || "Failed to add to wishlist");
       }
 
-      toast.success("Product added successfully!", {
-        description: "We'll start tracking the price for you.",
+      toast.success("Added to wishlist!", {
+        description: "Item saved for later tracking.",
       });
 
       form.reset();
-      router.refresh(); // Refresh the page data
+      router.refresh();
       onSuccess?.();
     } catch (error) {
-      toast.error("Failed to add product", {
+      toast.error("Failed to add to wishlist", {
         description:
           error instanceof Error ? error.message : "Please try again later",
       });
@@ -85,9 +97,12 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Product to Track</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Heart className="h-5 w-5" />
+          Add to Wishlist
+        </CardTitle>
         <CardDescription>
-          Paste an Amazon product URL to start tracking its price
+          Save items for later price tracking
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -98,7 +113,7 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product URL</FormLabel>
+                  <FormLabel>Item URL</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="https://www.amazon.com/dp/B01234567..."
@@ -107,8 +122,7 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Paste a product page URL (e.g., amazon.com/dp/B08N5...), not
-                    a search page
+                    Paste any product URL to save it
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -117,21 +131,19 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
 
             <FormField
               control={form.control}
-              name="targetPrice"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Target Price (Optional)</FormLabel>
+                  <FormLabel>Title (Optional)</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="99.99"
+                      placeholder="Custom title for this item"
                       {...field}
                       disabled={isLoading}
                     />
                   </FormControl>
                   <FormDescription>
-                    Get notified when the price drops below this amount
+                    Leave blank to auto-detect from the page
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -140,19 +152,21 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
 
             <FormField
               control={form.control}
-              name="category"
+              name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category (Optional)</FormLabel>
+                  <FormLabel>Notes (Optional)</FormLabel>
                   <FormControl>
-                    <CategorySelector
-                      selectedCategory={field.value}
-                      onCategoryChange={field.onChange}
+                    <Textarea
+                      placeholder="Add any notes about this item..."
+                      className="resize-none"
+                      rows={3}
+                      {...field}
                       disabled={isLoading}
                     />
                   </FormControl>
                   <FormDescription>
-                    Categorize your product for better organization
+                    Personal notes about this item
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -163,12 +177,12 @@ export function AddProductForm({ onSuccess }: AddProductFormProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Adding Product...
+                  Adding to Wishlist...
                 </>
               ) : (
                 <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Track This Product
+                  <Heart className="mr-2 h-4 w-4" />
+                  Add to Wishlist
                 </>
               )}
             </Button>

@@ -28,12 +28,14 @@ export const addProductFormSchema = z.object({
     .refine((val) => !val || parseFloat(val) > 0, {
       message: "Target price must be greater than 0",
     }),
+  category: z.string().nullable().optional(),
 });
 
 // Schema with transformation for API
 export const addProductSchema = addProductFormSchema.transform((data) => ({
   url: data.url,
   targetPrice: data.targetPrice ? parseFloat(data.targetPrice) : undefined,
+  category: data.category || null,
 }));
 
 export type AddProductFormInput = z.infer<typeof addProductFormSchema>;

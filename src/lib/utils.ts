@@ -47,5 +47,35 @@ export function getRelativeTime(date: Date): string {
   return "Just now";
 }
 
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+export function formatPriceCompact(price: number, currency: string = "USD"): string {
+  const localeMap: { [key: string]: string } = {
+    INR: "en-IN",
+    USD: "en-US",
+    GBP: "en-GB",
+    EUR: "de-DE",
+    JPY: "ja-JP",
+    CAD: "en-CA",
+    AUD: "en-AU",
+  };
+
+  const locale = localeMap[currency] || "en-US";
+
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: currency || "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
 
 

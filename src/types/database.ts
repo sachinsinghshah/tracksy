@@ -21,6 +21,7 @@ export interface Database {
           image_url: string | null;
           site: string;
           currency: string | null;
+          category: string | null;
           last_checked: string | null;
           is_active: boolean;
           created_at: string;
@@ -36,6 +37,7 @@ export interface Database {
           image_url?: string | null;
           site: string;
           currency?: string | null;
+          category?: string | null;
           last_checked?: string | null;
           is_active?: boolean;
           created_at?: string;
@@ -51,6 +53,7 @@ export interface Database {
           image_url?: string | null;
           site?: string;
           currency?: string | null;
+          category?: string | null;
           last_checked?: string | null;
           is_active?: boolean;
           created_at?: string;
@@ -105,6 +108,41 @@ export interface Database {
           email_sent?: boolean;
         };
       };
+      wishlist: {
+        Row: {
+          id: string;
+          user_id: string;
+          url: string;
+          title: string | null;
+          image_url: string | null;
+          site: string;
+          currency: string | null;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          url: string;
+          title?: string | null;
+          image_url?: string | null;
+          site: string;
+          currency?: string | null;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          url?: string;
+          title?: string | null;
+          image_url?: string | null;
+          site?: string;
+          currency?: string | null;
+          notes?: string | null;
+          created_at?: string;
+        };
+      };
     };
   };
 }
@@ -112,6 +150,4 @@ export interface Database {
 export type Product = Database["public"]["Tables"]["products"]["Row"];
 export type PriceHistory = Database["public"]["Tables"]["price_history"]["Row"];
 export type Alert = Database["public"]["Tables"]["alerts"]["Row"];
-
-
-
+export type WishlistItem = Database["public"]["Tables"]["wishlist"]["Row"];

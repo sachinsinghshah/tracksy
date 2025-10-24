@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, TrendingDown, Bell, Clock } from "lucide-react";
+import { Package, TrendingDown, Bell, Clock, Heart, Settings, BarChart3 } from "lucide-react";
 import { AddProductForm } from "@/components/AddProductForm";
 import { getRelativeTime } from "@/lib/utils";
 
@@ -49,13 +49,33 @@ export default async function DashboardPage() {
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold">Price Tracker</h1>
-            {totalProducts > 0 && (
-              <Link href="/dashboard/products">
+            <div className="flex gap-2">
+              {totalProducts > 0 && (
+                <Link href="/dashboard/products">
+                  <Button variant="ghost" size="sm">
+                    View All Products
+                  </Button>
+                </Link>
+              )}
+              <Link href="/dashboard/wishlist">
                 <Button variant="ghost" size="sm">
-                  View All Products
+                  <Heart className="mr-2 h-4 w-4" />
+                  Wishlist
                 </Button>
               </Link>
-            )}
+              <Link href="/dashboard/analytics">
+                <Button variant="ghost" size="sm">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Analytics
+                </Button>
+              </Link>
+              <Link href="/dashboard/settings">
+                <Button variant="ghost" size="sm">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-[hsl(var(--color-muted-foreground))]">
@@ -75,7 +95,7 @@ export default async function DashboardPage() {
 
       <main className="container flex-1 px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
             Welcome back! 👋
           </h2>
           <p className="text-[hsl(var(--color-muted-foreground))]">
@@ -83,7 +103,7 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
