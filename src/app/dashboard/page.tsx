@@ -9,7 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, TrendingDown, Bell, Clock } from "lucide-react";
+import { Package, TrendingDown, Bell, Clock, Heart, Settings } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { AddProductForm } from "@/components/AddProductForm";
 import { getRelativeTime } from "@/lib/utils";
 
@@ -49,15 +50,36 @@ export default async function DashboardPage() {
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold">Price Tracker</h1>
-            {totalProducts > 0 && (
-              <Link href="/dashboard/products">
+            <div className="flex gap-2">
+              {totalProducts > 0 && (
+                <Link href="/dashboard/products">
+                  <Button variant="ghost" size="sm">
+                    View All Products
+                  </Button>
+                </Link>
+              )}
+              <Link href="/dashboard/wishlists">
                 <Button variant="ghost" size="sm">
-                  View All Products
+                  <Heart className="mr-2 h-4 w-4" />
+                  Wishlists
                 </Button>
               </Link>
-            )}
+              <Link href="/dashboard/alerts">
+                <Button variant="ghost" size="sm">
+                  <Bell className="mr-2 h-4 w-4" />
+                  Alerts
+                </Button>
+              </Link>
+              <Link href="/dashboard/settings">
+                <Button variant="ghost" size="sm">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <span className="text-sm text-[hsl(var(--color-muted-foreground))]">
               {user.email}
             </span>
