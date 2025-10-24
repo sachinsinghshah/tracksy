@@ -1,5 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { sendPriceDropEmail } from "@/lib/email";
 
 /**
  * Cron job to send email alerts for price drops
@@ -84,19 +85,27 @@ export async function POST(request: NextRequest) {
     let successCount = 0;
     let errorCount = 0;
 
-    // TODO: Implement email sending with Resend
-    // For now, just mark as sent for demonstration
+    // Send emails using Resend
     for (const alert of alerts) {
       try {
         console.log(`[Alert Cron] Processing alert ${alert.id}`);
 
-        // TODO: Send email using Resend API
-        // const emailResult = await sendPriceDropEmail({
-        //   to: alert.users.email,
-        //   product: alert.products,
-        //   oldPrice: alert.old_price,
-        //   newPrice: alert.new_price,
-        // });
+        // Send email using Resend API
+        const emailResult = await sendPriceDropEmail({
+          to: alert.users.email,
+          product: alert.products,
+          oldPrice: alert.old_price,
+          newPrice: alert.new_price,
+        });
+
+        if (!emailResult.success) {
+          console.error(
+            `[Alert Cron] Failed to send email for alert ${alert.id}:`,
+            emailResult.error
+          );
+          errorCount++;
+          continue;
+        }
 
         // Mark alert as sent
         const { error: updateError } = await (supabase as any)
@@ -114,7 +123,7 @@ export async function POST(request: NextRequest) {
         }
 
         successCount++;
-        console.log(`[Alert Cron] Alert ${alert.id} processed successfully`);
+        console.log(`[Alert Cron] Alert ${alert.id} sent successfully to ${alert.users.email}`);
       } catch (error) {
         console.error(`[Alert Cron] Error processing alert ${alert.id}:`, error);
         errorCount++;
