@@ -123,21 +123,30 @@ For detailed development notes, database schema, API routes, and implementation 
 
 ### Setting up Cron Jobs
 
-Vercel Cron Jobs are already configured in `vercel.json` to periodically check prices every 6 hours.
+We use [cron-job.org](https://cron-job.org/) as an external cron service to trigger price checks every 6 hours.
 
-**For detailed setup instructions, see:**
+**Why cron-job.org?**
 
-- [CRON_JOBS_SETUP.md](./CRON_JOBS_SETUP.md) - Complete guide to cron jobs
-- [VERCEL_CONFIGURATION.md](./VERCEL_CONFIGURATION.md) - Vercel configuration options
+- ✅ No timeout limitations (Vercel Hobby has 10s limit)
+- ✅ Works perfectly with Puppeteer
+- ✅ Better monitoring and notifications
+- ✅ Completely free
 
-**Quick Test:**
+**Quick Setup:**
+
+1. Sign up at [cron-job.org](https://cron-job.org/)
+2. Create a new cronjob
+3. URL: `https://your-app.vercel.app/api/cron/check-prices?secret=YOUR_CRON_SECRET`
+4. Schedule: Every 6 hours (`0 */6 * * *`)
+5. Test and enable!
+
+**Detailed guide:** [CRON_JOB_ORG_SETUP.md](./CRON_JOB_ORG_SETUP.md)
+
+**Test your API:**
 
 ```bash
-# Local testing
-./scripts/test-cron.sh
-
-# Or with PowerShell
-.\scripts\test-cron.ps1
+# Test endpoint
+curl https://your-app.vercel.app/api/cron/check-prices?secret=YOUR_SECRET
 
 # Check health
 curl https://your-app.vercel.app/api/health
