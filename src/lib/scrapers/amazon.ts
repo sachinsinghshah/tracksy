@@ -1,11 +1,19 @@
-import puppeteer, { Browser, Page } from "puppeteer";
 import type { ScrapedProduct, ScraperResult } from "@/types";
+import { Browser, Page } from "puppeteer-core";
 
-// Import chromium for serverless environments (Vercel)
-let chromium: any;
-if (process.env.VERCEL) {
-  chromium = require("@sparticuz/chromium");
-}
+// Dynamic imports for different environments
+const getPuppeteer = async () => {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+    // Serverless environment
+    const chromium = await import("@sparticuz/chromium");
+    const puppeteerCore = await import("puppeteer-core");
+    return { puppeteer: puppeteerCore.default, chromium: chromium.default };
+  } else {
+    // Local development
+    const puppeteer = await import("puppeteer");
+    return { puppeteer: puppeteer.default, chromium: null };
+  }
+};
 
 // User agents for rotation
 const USER_AGENTS = [
@@ -32,12 +40,20 @@ export async function scrapeAmazonProduct(
   try {
     console.log(`[Scraper] Starting scrape for: ${url}`);
 
+    // Get the appropriate puppeteer instance
+    const { puppeteer, chromium } = await getPuppeteer();
+
     // Launch browser with stealth settings
     // Use chromium for Vercel, puppeteer for local development
     const launchOptions: any = {
-      headless: true,
+      headless: chromium ? chromium.headless : true,
       args: chromium
-        ? chromium.args
+        ? [
+            ...chromium.args,
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+          ]
         : [
             "--no-sandbox",
             "--disable-setuid-sandbox",
@@ -49,6 +65,7 @@ export async function scrapeAmazonProduct(
           ],
       ...(chromium && {
         executablePath: await chromium.executablePath(),
+        defaultViewport: chromium.defaultViewport,
       }),
     };
 
