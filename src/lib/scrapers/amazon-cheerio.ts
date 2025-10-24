@@ -115,7 +115,7 @@ export async function scrapeAmazonProduct(
       price,
       ...(imageUrl && { imageUrl }),
       currency,
-      availability: "In Stock", // Cheerio version always assumes in stock
+      availability: true, // Cheerio version always assumes available
     };
 
     console.log("[Scraper] Scraping completed successfully");
