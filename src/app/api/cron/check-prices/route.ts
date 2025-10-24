@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
       .from("products")
       .select("*")
       .eq("is_active", true)
-      .order("last_checked", { ascending: true, nullsFirst: true });
+      // .order("last_checked", { ascending: true, nullsFirst: true });
+      .order("last_checked", { ascending: true, nullsFirst: true }).limit(5); // Only check 5 products per run (adjust based on testing)
 
     if (fetchError) {
       console.error("[Cron] Error fetching products:", fetchError);
