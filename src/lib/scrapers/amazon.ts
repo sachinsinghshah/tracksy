@@ -1,6 +1,12 @@
 import puppeteer, { Browser, Page } from "puppeteer";
 import type { ScrapedProduct, ScraperResult } from "@/types";
 
+// Import chromium for serverless environments (Vercel)
+let chromium: any;
+if (process.env.VERCEL) {
+  chromium = require("@sparticuz/chromium");
+}
+
 // User agents for rotation
 const USER_AGENTS = [
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -27,18 +33,26 @@ export async function scrapeAmazonProduct(
     console.log(`[Scraper] Starting scrape for: ${url}`);
 
     // Launch browser with stealth settings
-    browser = await puppeteer.launch({
+    // Use chromium for Vercel, puppeteer for local development
+    const launchOptions: any = {
       headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-accelerated-2d-canvas",
-        "--no-first-run",
-        "--no-zygote",
-        "--disable-gpu",
-      ],
-    });
+      args: chromium
+        ? chromium.args
+        : [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-accelerated-2d-canvas",
+            "--no-first-run",
+            "--no-zygote",
+            "--disable-gpu",
+          ],
+      ...(chromium && {
+        executablePath: await chromium.executablePath(),
+      }),
+    };
+
+    browser = await puppeteer.launch(launchOptions);
 
     page = await browser.newPage();
 
