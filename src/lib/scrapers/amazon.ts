@@ -65,7 +65,6 @@ export async function scrapeAmazonProduct(
           ],
       ...(chromium && {
         executablePath: await chromium.executablePath(),
-        defaultViewport: chromium.defaultViewport,
       }),
     };
 

@@ -22,11 +22,9 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "2mb",
     },
-    serverComponentsExternalPackages: [
-      "@sparticuz/chromium",
-      "puppeteer-core",
-    ],
   },
+  // External packages for serverless functions (Next.js 16+)
+  serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
 };
 
 export default nextConfig;
