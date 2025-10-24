@@ -113,7 +113,7 @@ export async function scrapeAmazonProduct(
     const result: ScrapedProduct = {
       title,
       price,
-      imageUrl: imageUrl || undefined,
+      ...(imageUrl && { imageUrl }),
       currency,
       availability: "In Stock", // Cheerio version always assumes in stock
     };
