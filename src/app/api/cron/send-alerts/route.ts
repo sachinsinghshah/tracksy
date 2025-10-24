@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -12,6 +12,10 @@ export async function POST(request: NextRequest) {
     // Verify cron secret for security
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
+    
+    // Also check query parameter for compatibility with external cron services
+    const { searchParams } = new URL(request.url);
+    const querySecret = searchParams.get("secret");
 
     if (!cronSecret) {
       console.error("[Alert Cron] CRON_SECRET not configured");
@@ -21,14 +25,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (authHeader !== `Bearer ${cronSecret}`) {
+    // Check both Authorization header and query parameter
+    const isAuthorized = 
+      authHeader === `Bearer ${cronSecret}` || 
+      querySecret === cronSecret;
+
+    if (!isAuthorized) {
       console.error("[Alert Cron] Unauthorized access attempt");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     console.log("[Alert Cron] Starting email alert job...");
 
-    const supabase = createClient();
+    const supabase = createServiceClient();
 
     // Fetch unsent alerts
     const { data: alerts, error: fetchError } = await (supabase as any)

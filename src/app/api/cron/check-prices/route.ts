@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { scrapeAmazonProductWithRetry } from "@/lib/scrapers/amazon";
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     console.log("[Cron] Starting price check job...");
 
     // Create Supabase client with service role for cron jobs
-    const supabase = createClient();
+    const supabase = createServiceClient();
 
     // Fetch all active products
     const { data: products, error: fetchError } = await (supabase as any)
